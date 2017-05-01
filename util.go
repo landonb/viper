@@ -22,6 +22,7 @@ import (
 	"unicode"
 
 	"github.com/hashicorp/hcl"
+	"github.com/hjson/hjson-go"
 	"github.com/magiconair/properties"
 	toml "github.com/pelletier/go-toml"
 	"github.com/spf13/cast"
@@ -164,6 +165,11 @@ func unmarshallConfigReader(in io.Reader, c map[string]interface{}, configType s
 
 	case "json":
 		if err := json.Unmarshal(buf.Bytes(), &c); err != nil {
+			return ConfigParseError{err}
+		}
+
+	case "hjson":
+		if err := hjson.Unmarshal(buf.Bytes(), &c); err != nil {
 			return ConfigParseError{err}
 		}
 
