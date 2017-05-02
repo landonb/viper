@@ -1123,7 +1123,7 @@ func (v *Viper) ReadInConfig() error {
 
 	config := make(map[string]interface{})
 
-	err = v.unmarshalReader(bytes.NewReader(file), config)
+	err = v.unmarshalReader(bytes.NewReader(file), &config)
 	if err != nil {
 		return err
 	}
@@ -1158,7 +1158,7 @@ func (v *Viper) MergeInConfig() error {
 func ReadConfig(in io.Reader) error { return v.ReadConfig(in) }
 func (v *Viper) ReadConfig(in io.Reader) error {
 	v.config = make(map[string]interface{})
-	return v.unmarshalReader(in, v.config)
+	return v.unmarshalReader(in, &v.config)
 }
 
 // MergeConfig merges a new configuration with an existing config.
@@ -1168,7 +1168,7 @@ func (v *Viper) MergeConfig(in io.Reader) error {
 		v.config = make(map[string]interface{})
 	}
 	cfg := make(map[string]interface{})
-	if err := v.unmarshalReader(in, cfg); err != nil {
+	if err := v.unmarshalReader(in, &cfg); err != nil {
 		return err
 	}
 	mergeMaps(cfg, v.config, nil)
@@ -1289,11 +1289,11 @@ func (v *Viper) WatchRemoteConfigOnChannel() error {
 
 // Unmarshall a Reader into a map.
 // Should probably be an unexported function.
-func unmarshalReader(in io.Reader, c map[string]interface{}) error {
+func unmarshalReader(in io.Reader, c *map[string]interface{}) error {
 	return v.unmarshalReader(in, c)
 }
 
-func (v *Viper) unmarshalReader(in io.Reader, c map[string]interface{}) error {
+func (v *Viper) unmarshalReader(in io.Reader, c *map[string]interface{}) error {
 	return unmarshallConfigReader(in, c, v.getConfigType())
 }
 
@@ -1326,7 +1326,7 @@ func (v *Viper) getRemoteConfig(provider RemoteProvider) (map[string]interface{}
 	if err != nil {
 		return nil, err
 	}
-	err = v.unmarshalReader(reader, v.kvstore)
+	err = v.unmarshalReader(reader, &v.kvstore)
 	return v.kvstore, err
 }
 
@@ -1339,7 +1339,7 @@ func (v *Viper) watchKeyValueConfigOnChannel() error {
 			for {
 				b := <-rc
 				reader := bytes.NewReader(b.Value)
-				v.unmarshalReader(reader, v.kvstore)
+				v.unmarshalReader(reader, &v.kvstore)
 			}
 		}(respc)
 		return nil
@@ -1365,7 +1365,7 @@ func (v *Viper) watchRemoteConfig(provider RemoteProvider) (map[string]interface
 	if err != nil {
 		return nil, err
 	}
-	err = v.unmarshalReader(reader, v.kvstore)
+	err = v.unmarshalReader(reader, &v.kvstore)
 	return v.kvstore, err
 }
 

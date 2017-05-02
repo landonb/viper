@@ -153,23 +153,23 @@ func userHomeDir() string {
 	return os.Getenv("HOME")
 }
 
-func unmarshallConfigReader(in io.Reader, c map[string]interface{}, configType string) error {
+func unmarshallConfigReader(in io.Reader, c *map[string]interface{}, configType string) error {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(in)
 
 	switch strings.ToLower(configType) {
 	case "yaml", "yml":
-		if err := yaml.Unmarshal(buf.Bytes(), &c); err != nil {
+		if err := yaml.Unmarshal(buf.Bytes(), c); err != nil {
 			return ConfigParseError{err}
 		}
 
 	case "json":
-		if err := json.Unmarshal(buf.Bytes(), &c); err != nil {
+		if err := json.Unmarshal(buf.Bytes(), c); err != nil {
 			return ConfigParseError{err}
 		}
 
 	case "hjson":
-		if err := hjson.Unmarshal(buf.Bytes(), &c); err != nil {
+		if err := hjson.Unmarshal(buf.Bytes(), c); err != nil {
 			return ConfigParseError{err}
 		}
 
@@ -189,7 +189,7 @@ func unmarshallConfigReader(in io.Reader, c map[string]interface{}, configType s
 		}
 		tmap := tree.ToMap()
 		for k, v := range tmap {
-			c[k] = v
+			(*c)[k] = v
 		}
 
 	case "properties", "props", "prop":
@@ -203,13 +203,13 @@ func unmarshallConfigReader(in io.Reader, c map[string]interface{}, configType s
 			// recursively build nested maps
 			path := strings.Split(key, ".")
 			lastKey := strings.ToLower(path[len(path)-1])
-			deepestMap := deepSearch(c, path[0:len(path)-1])
+			deepestMap := deepSearch(*c, path[0:len(path)-1])
 			// set innermost value
 			deepestMap[lastKey] = value
 		}
 	}
 
-	insensitiviseMap(c)
+	insensitiviseMap(*c)
 	return nil
 }
 
