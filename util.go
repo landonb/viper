@@ -59,7 +59,7 @@ func copyAndInsensitiviseMap(m map[string]interface{}) map[string]interface{} {
 	nm := make(map[string]interface{})
 
 	for key, val := range m {
-		lkey := strings.ToLower(key)
+		lkey := v.onNormalizeCase(key)
 		switch v := val.(type) {
 		case map[interface{}]interface{}:
 			nm[lkey] = copyAndInsensitiviseMap(cast.ToStringMap(v))
@@ -85,7 +85,7 @@ func insensitiviseMap(m map[string]interface{}) {
 			insensitiviseMap(val.(map[string]interface{}))
 		}
 
-		lower := strings.ToLower(key)
+		lower := v.onNormalizeCase(key)
 		if key != lower {
 			// remove old key (not lower-cased)
 			delete(m, key)
@@ -202,7 +202,7 @@ func unmarshallConfigReader(in io.Reader, c *map[string]interface{}, configType 
 			value, _ := p.Get(key)
 			// recursively build nested maps
 			path := strings.Split(key, ".")
-			lastKey := strings.ToLower(path[len(path)-1])
+			lastKey := v.onNormalizeCase(path[len(path)-1])
 			deepestMap := deepSearch(*c, path[0:len(path)-1])
 			// set innermost value
 			deepestMap[lastKey] = value
