@@ -1470,6 +1470,72 @@ outer:
 	return shadow
 }
 
+// KeyNames returns all the top-level key names defined, so
+// the caller doesn't have to know what they're looking for.
+func KeyNames() []string { return v.KeyNames() }
+func (v *Viper) KeyNames() []string {
+	// 2017-05-02: [lb] added this fcn./feature.
+	keyList := make([]string, 0)
+	// add all paths; neither order/priority nor shadowing matters
+	keyList = v.addKeyNamesMString(keyList, v.aliases)
+	keyList = v.addKeyNames(keyList, v.override)
+	keyList = v.addKeyNamesMFlagValue(keyList, v.pflags)
+	keyList = v.addKeyNamesMString(keyList, v.env)
+	keyList = v.addKeyNames(keyList, v.config)
+	keyList = v.addKeyNames(keyList, v.kvstore)
+	keyList = v.addKeyNames(keyList, v.defaults)
+	return keyList
+}
+
+func (v *Viper) addKeyNames(keyList []string, valMap map[string]interface{}) []string {
+	for key, _ := range valMap {
+		found := false
+		for _, key_ := range keyList {
+			if key == key_ {
+				found = true
+				break
+			}
+		}
+		if !found {
+			keyList = append(keyList, key)
+		}
+	}
+	return keyList
+}
+
+func (v *Viper) addKeyNamesMString(keyList []string, valMap map[string]string) []string {
+	for key, _ := range valMap {
+		found := false
+		for _, key_ := range keyList {
+			if key == key_ {
+				found = true
+				break
+			}
+		}
+		if !found {
+			keyList = append(keyList, key)
+		}
+	}
+	return keyList
+}
+
+func (v *Viper) addKeyNamesMFlagValue(keyList []string, valMap map[string]FlagValue) []string {
+	for key, _ := range valMap {
+		found := false
+		for _, key_ := range keyList {
+			if key == key_ {
+				found = true
+				break
+			}
+		}
+		if !found {
+			keyList = append(keyList, key)
+		}
+	}
+	return keyList
+}
+
+
 // AllSettings merges all settings and returns them as a map[string]interface{}.
 func AllSettings() map[string]interface{} { return v.AllSettings() }
 func (v *Viper) AllSettings() map[string]interface{} {
