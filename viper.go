@@ -165,8 +165,12 @@ type Viper struct {
 
 	onConfigChange func(fsnotify.Event)
 
-	// [lb] To marshal from map to struct, need public members,
-	// i.e., first letter must be capitalized.
+	// [lb] To marshal from map to struct (say, using mapstructure.Decode,
+	// need public members, i.e., first letter must be capitalized.
+	//   E.g., user might call,
+	//     viper.SetNormalizeCase(strings.Title).
+	//   Or, if you desire *no* changing of keys, try,
+	//     viper.SetNormalizeCase(func(inout string) string { return inout }).
 	onNormalizeCase func(string) string
 }
 
@@ -583,13 +587,13 @@ func (v *Viper) SetTypeByDefaultValue(enable bool) {
 	v.typeByDefValue = enable
 }
 
-// OnNormalizeCase lets the user indicate how text should be normalized.
+// SetNormalizeCase lets the user indicate how text should be normalized.
 // The default is just to convert each key to lowercase, but if you want
 // to marshal a map into a struct using third-party libraries, you'll need
 // to expose the struct members publicly, which means key names should begin
 // with an uppercase character.
-func OnNormalizeCase(run func(str string) string) { v.OnNormalizeCase(run) }
-func (v *Viper) OnNormalizeCase(run func(str string) string) {
+func SetNormalizeCase(run func(str string) string) { v.SetNormalizeCase(run) }
+func (v *Viper) SetNormalizeCase(run func(str string) string) {
 	v.onNormalizeCase = run
 }
 
