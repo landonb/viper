@@ -568,6 +568,11 @@ func (v *Viper) isPathShadowedInAutoEnv(path []string) string {
 	return ""
 }
 
+func SetKeyDelim(delim string) { v.SetKeyDelim(delim) }
+func (v *Viper) SetKeyDelim(delim string) {
+	v.keyDelim = delim
+}
+
 // SetTypeByDefaultValue enables or disables the inference of a key value's
 // type when the Get function is used based upon a key's default value as
 // opposed to the value returned based on the normal fetch logic.
