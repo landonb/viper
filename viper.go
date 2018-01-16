@@ -1626,11 +1626,11 @@ func (v *Viper) getConfigFile() (string, error) {
 }
 
 func (v *Viper) searchInPath(in string) (filename string) {
-	jww.DEBUG.Println("Searching for config in ", in)
+	jww.DEBUG.Println("Searching for config in", in)
 	for _, ext := range SupportedExts {
 		jww.DEBUG.Println("Checking for", filepath.Join(in, v.configName+"."+ext))
 		if b, _ := exists(filepath.Join(in, v.configName+"."+ext)); b {
-			jww.DEBUG.Println("Found: ", filepath.Join(in, v.configName+"."+ext))
+			jww.DEBUG.Println("Found:", filepath.Join(in, v.configName+"."+ext))
 			return filepath.Join(in, v.configName+"."+ext)
 		}
 	}
@@ -1642,7 +1642,7 @@ func (v *Viper) searchInPath(in string) (filename string) {
 // Returns the first path that exists (and is a config file).
 func (v *Viper) findConfigFile() (string, error) {
 
-	jww.INFO.Println("Searching for config in ", v.configPaths)
+	jww.INFO.Println("Searching for config in", v.configPaths)
 
 	for _, cp := range v.configPaths {
 		file := v.searchInPath(cp)
